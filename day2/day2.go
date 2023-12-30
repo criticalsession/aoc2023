@@ -16,10 +16,11 @@ func main() {
 		panic(err)
 	}
 
-	solve(s, false)
+	solve(s)
+	solvePart2(s)
 }
 
-func solve(s []string, part1 bool) {
+func solve(s []string) {
 	gameTotal := 0
 	for gameNo, line := range s {
 		setsOk := true
@@ -38,6 +39,25 @@ func solve(s []string, part1 bool) {
 	fmt.Println("Total:", gameTotal)
 }
 
+func solvePart2(s []string) {
+	gameTotal := 0
+	for _, line := range s {
+		var mins ColorMap = ColorMap{
+			Red: 0, Green: 0, Blue: 0,
+		}
+		for _, set := range utils.SplitAndTrim(line, ";") {
+			col := getColorsFromSet(set)
+			mins[Red] = max(mins[Red], col[Red])
+			mins[Blue] = max(mins[Blue], col[Blue])
+			mins[Green] = max(mins[Green], col[Green])
+		}
+
+		gameTotal += mins.Power()
+	}
+
+	fmt.Println("Total:", gameTotal)
+}
+
 type Color int
 
 const (
@@ -46,8 +66,14 @@ const (
 	Blue
 )
 
-func getColorsFromSet(s string) map[Color]int {
-	colorsInSet := map[Color]int{
+type ColorMap map[Color]int
+
+func (m *ColorMap) Power() int {
+	return (*m)[Red] * (*m)[Blue] * (*m)[Green]
+}
+
+func getColorsFromSet(s string) ColorMap {
+	colorsInSet := ColorMap{
 		Red: 0, Green: 0, Blue: 0,
 	}
 
