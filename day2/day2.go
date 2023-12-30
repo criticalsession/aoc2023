@@ -16,35 +16,17 @@ func main() {
 		panic(err)
 	}
 
-	solve(s)
-	solvePart2(s)
+	solve(s, false)
+	solve(s, true)
 }
 
-func solve(s []string) {
+func solve(s []string, part2 bool) {
 	gameTotal := 0
 	for gameNo, line := range s {
-		setsOk := true
-		for _, set := range utils.SplitAndTrim(line, ";") {
-			col := getColorsFromSet(set)
-			if col[Red] > 12 || col[Green] > 13 || col[Blue] > 14 {
-				setsOk = false
-			}
-		}
-
-		if setsOk {
-			gameTotal += gameNo + 1
-		}
-	}
-
-	fmt.Println("Total:", gameTotal)
-}
-
-func solvePart2(s []string) {
-	gameTotal := 0
-	for _, line := range s {
-		var mins ColorMap = ColorMap{
+		mins := ColorMap{
 			Red: 0, Green: 0, Blue: 0,
 		}
+
 		for _, set := range utils.SplitAndTrim(line, ";") {
 			col := getColorsFromSet(set)
 			mins[Red] = max(mins[Red], col[Red])
@@ -52,7 +34,11 @@ func solvePart2(s []string) {
 			mins[Green] = max(mins[Green], col[Green])
 		}
 
-		gameTotal += mins.Power()
+		if !part2 && mins[Red] <= 12 && mins[Green] <= 13 && mins[Blue] <= 14 {
+			gameTotal += gameNo + 1
+		} else if part2 {
+			gameTotal += mins.Power()
+		}
 	}
 
 	fmt.Println("Total:", gameTotal)
