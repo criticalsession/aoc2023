@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -46,4 +47,11 @@ func Catch(err error) {
 		fmt.Println("ERROR:", err.Error())
 		os.Exit(1)
 	}
+}
+
+func ReplaceAndGetInt(s string, label string) int {
+	val, err := strconv.Atoi(strings.TrimSpace(strings.Replace(s, label, "", -1)))
+	Catch(err)
+
+	return val
 }
