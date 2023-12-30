@@ -1,24 +1,15 @@
 package main
 
 import (
-	_ "embed"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/criticalsession/aoc2023/utils"
 )
 
-func catch(err error) {
-	if err != nil {
-		fmt.Println("ERROR:", err.Error())
-		os.Exit(1)
-	}
-}
-
 func main() {
 	s, err := utils.GetInput("day1input.txt")
-	catch(err)
+	utils.Catch(err)
 
 	solve(s, false)
 	solve(s, true)

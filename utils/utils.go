@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
@@ -19,4 +20,11 @@ func GetInput(f string) ([]string, error) {
 	}
 
 	return lines, scanner.Err()
+}
+
+func Catch(err error) {
+	if err != nil {
+		fmt.Println("ERROR:", err.Error())
+		os.Exit(1)
+	}
 }
