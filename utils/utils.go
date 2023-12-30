@@ -33,6 +33,14 @@ func GetInput(o InputOptions) ([]string, error) {
 	return lines, scanner.Err()
 }
 
+func SplitAndTrim(s string, sep string) []string {
+	var parts []string
+	for _, p := range strings.Split(s, sep) {
+		parts = append(parts, strings.TrimSpace(p))
+	}
+	return parts
+}
+
 func Catch(err error) {
 	if err != nil {
 		fmt.Println("ERROR:", err.Error())
