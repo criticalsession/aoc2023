@@ -4,10 +4,16 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
-func GetInput(f string) ([]string, error) {
-	file, err := os.Open(f)
+type InputOptions struct {
+	Path  string
+	Split string
+}
+
+func GetInput(o InputOptions) ([]string, error) {
+	file, err := os.Open(o.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -16,7 +22,12 @@ func GetInput(f string) ([]string, error) {
 	var lines []string
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+		t := scanner.Text()
+		if o.Split != "" {
+			t = strings.Split(t, o.Split)[1]
+			t = strings.TrimSpace(t)
+		}
+		lines = append(lines, t)
 	}
 
 	return lines, scanner.Err()

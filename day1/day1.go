@@ -8,7 +8,9 @@ import (
 )
 
 func main() {
-	s, err := utils.GetInput("day1input.txt")
+	s, err := utils.GetInput(utils.InputOptions{
+		Path: "day1input.txt",
+	})
 	utils.Catch(err)
 
 	solve(s, false)

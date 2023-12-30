@@ -1,9 +1,16 @@
 package main
 
-import "github.com/criticalsession/aoc2023/utils"
+import (
+	"fmt"
+
+	"github.com/criticalsession/aoc2023/utils"
+)
 
 func main() {
-	s, err := utils.GetInput("day2sample.txt")
+	s, err := utils.GetInput(utils.InputOptions{
+		Path:  "day2sample.txt",
+		Split: ":",
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -12,5 +19,11 @@ func main() {
 }
 
 func solve(s []string, part1 bool) {
+	gameIdTotal := 0
+	for gameNo, line := range s {
+		fmt.Println(line)
+		gameIdTotal += gameNo
+	}
 
+	fmt.Println("Total:", gameIdTotal)
 }
