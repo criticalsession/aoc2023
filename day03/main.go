@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/criticalsession/aoc2023/utils"
 )
@@ -75,30 +76,27 @@ func solve(s []string, part2 bool) {
 
 func hasAdjacentSymbols(l, prev, next string, start, end, lineLen int) bool {
 	symbols := []string{"+", "-", "*", "/", "$", "%", "#", "@", "&"}
-	sameLine, _ := workCoords(start, end, lineLen)
+	coords := workCoords(start, end, lineLen)
 
 	for _, sym := range symbols {
-		for _, cSame := range sameLine {
-			if string(l[cSame]) == sym {
-				return true
-			}
+		if strings.Contains(l[coords[0]:coords[1]], sym) {
+			return true
 		}
 	}
 
 	return false
 }
 
-func workCoords(start, end, lineLen int) ([]int, []int) {
-	sameLine := make([]int, 0, 2)
-	adjLine := make([]int, 0, (end-start)+2)
+func workCoords(start, end, lineLen int) [2]int {
+	coords := [2]int{start, end}
 
 	if start > 0 {
-		sameLine = append(sameLine, start-1)
+		coords[0] = start - 1
 	}
 
 	if end < lineLen {
-		sameLine = append(sameLine, end)
+		coords[1] = end + 1
 	}
 
-	return sameLine, adjLine
+	return coords
 }
