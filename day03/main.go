@@ -9,7 +9,7 @@ import (
 
 func main() {
 	s, err := utils.GetInput(utils.InputOptions{
-		Path: "sample.txt",
+		Path: "input.txt",
 	})
 	utils.Catch(err)
 
@@ -18,7 +18,6 @@ func main() {
 
 func solve(s []string, part2 bool) {
 	total := 0
-
 	lineLen := 0
 
 	for i, line := range s {
@@ -35,34 +34,43 @@ func solve(s []string, part2 bool) {
 					started = j
 				}
 				nColl += string(n)
+
+				if prev == "" && next == "" {
+					if i > 0 {
+						prev = s[i-1]
+					} else {
+						prev = ""
+					}
+
+					if i < len(s)-1 {
+						next = s[i+1]
+					} else {
+						next = ""
+					}
+				}
 			} else {
 				if nColl != "" {
 					// process collected
-					if prev == "" && next == "" {
-						if i > 0 {
-							prev = s[i-1]
-						} else {
-							prev = ""
-						}
-
-						if i < len(s)-1 {
-							next = s[i+1]
-						} else {
-							next = ""
-						}
-					}
-
 					if hasAdjacentSymbols(line, prev,
 						next, started, started+len(nColl),
 						lineLen) {
 
 						total += utils.ConvertToNumber(nColl)
-						fmt.Println("Found:", nColl)
 					}
 
 					started = -1
 					nColl = ""
 				}
+			}
+		}
+
+		if nColl != "" {
+			// process collected
+			if hasAdjacentSymbols(line, prev,
+				next, started, started+len(nColl),
+				lineLen) {
+
+				total += utils.ConvertToNumber(nColl)
 			}
 		}
 	}
@@ -75,11 +83,19 @@ func solve(s []string, part2 bool) {
 }
 
 func hasAdjacentSymbols(l, prev, next string, start, end, lineLen int) bool {
-	symbols := []string{"+", "-", "*", "/", "$", "%", "#", "@", "&"}
+	symbols := []string{"+", "-", "*", "/", "$", "%", "#", "@", "&", "="}
 	coords := workCoords(start, end, lineLen)
 
 	for _, sym := range symbols {
 		if strings.Contains(l[coords[0]:coords[1]], sym) {
+			return true
+		}
+
+		if prev != "" && strings.Contains(prev[coords[0]:coords[1]], sym) {
+			return true
+		}
+
+		if next != "" && strings.Contains(next[coords[0]:coords[1]], sym) {
 			return true
 		}
 	}
