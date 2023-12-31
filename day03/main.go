@@ -14,11 +14,19 @@ func main() {
 	utils.Catch(err)
 
 	solve(s, false)
+	solve(s, true)
 }
+
+type gearLoc struct {
+	x, y int
+}
+
+type gearMap map[gearLoc][]int
 
 func solve(s []string, part2 bool) {
 	total := 0
 	lineLen := 0
+	var gears gearMap = gearMap{}
 
 	for i, line := range s {
 		if i == 0 {
@@ -50,12 +58,22 @@ func solve(s []string, part2 bool) {
 				}
 			} else {
 				if nColl != "" {
-					// process collected
-					if hasAdjacentSymbols(line, prev,
-						next, started, started+len(nColl),
-						lineLen) {
+					if !part2 {
+						// process collected
+						if hasAdjacentSymbols(line, prev,
+							next, started, started+len(nColl),
+							lineLen) {
 
-						total += utils.ConvertToNumber(nColl)
+							total += utils.ConvertToNumber(nColl)
+						}
+					} else {
+						found, x, y := findGear(line, prev, next,
+							started, started+len(nColl), lineLen)
+
+						if found {
+							loc := gearLoc{x: x, y: y + i} // y is relative to current line
+							gears[loc] = append(gears[loc], utils.ConvertToNumber(nColl))
+						}
 					}
 
 					started = -1
@@ -64,18 +82,34 @@ func solve(s []string, part2 bool) {
 			}
 		}
 
+		// for numbers that end because of new line
 		if nColl != "" {
-			// process collected
-			if hasAdjacentSymbols(line, prev,
-				next, started, started+len(nColl),
-				lineLen) {
+			if !part2 {
+				// process collected
+				if hasAdjacentSymbols(line, prev,
+					next, started, started+len(nColl),
+					lineLen) {
 
-				total += utils.ConvertToNumber(nColl)
+					total += utils.ConvertToNumber(nColl)
+				}
+			} else {
+				found, x, y := findGear(line, prev, next,
+					started, started+len(nColl), lineLen)
+
+				if found {
+					loc := gearLoc{x: x, y: y + i} // y is relative to current line
+					gears[loc] = append(gears[loc], utils.ConvertToNumber(nColl))
+				}
 			}
 		}
 	}
 
 	if part2 {
+		for _, vals := range gears {
+			if len(vals) == 2 {
+				total += vals[0] * vals[1]
+			}
+		}
 		fmt.Println("Total p2:", total)
 	} else {
 		fmt.Println("Total p1:", total)
@@ -101,6 +135,26 @@ func hasAdjacentSymbols(l, prev, next string, start, end, lineLen int) bool {
 	}
 
 	return false
+}
+
+func findGear(l, prev, next string, start, end, lineLen int) (bool, int, int) {
+	coords := workCoords(start, end, lineLen)
+
+	for i := coords[0]; i < coords[1]; i++ {
+		if prev != "" && prev[i] == '*' {
+			return true, i, -1
+		}
+
+		if l[i] == '*' {
+			return true, i, 0
+		}
+
+		if next != "" && next[i] == '*' {
+			return true, i, 1
+		}
+	}
+
+	return false, -1, -1
 }
 
 func workCoords(start, end, lineLen int) [2]int {
