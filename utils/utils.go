@@ -55,3 +55,14 @@ func ReplaceAndGetInt(s string, label string) int {
 
 	return val
 }
+
+func IsNumber(n byte) bool {
+	return n >= '0' && n <= '9'
+}
+
+func ConvertToNumber(s string) int {
+	i, err := strconv.Atoi(s)
+	Catch(err)
+
+	return i
+}
