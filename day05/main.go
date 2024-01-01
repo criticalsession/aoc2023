@@ -4,21 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	. "github.com/criticalsession/aoc2023/day05/data"
 	"github.com/criticalsession/aoc2023/utils"
 )
-
-type parsedData struct {
-	seeds       []int
-	rangeBlocks []rangeBlock
-}
-
-type valRange struct {
-	destStart   int
-	sourceStart int
-	width       int
-}
-
-type rangeBlock []valRange
 
 func main() {
 	s, err := utils.GetInput(utils.InputOptions{
@@ -34,12 +22,12 @@ func solve(s []string, partTwo bool) {
 	fmt.Println(d)
 }
 
-func parseInput(s *[]string) parsedData {
-	d := parsedData{
-		rangeBlocks: make([]rangeBlock, 7),
+func parseInput(s *[]string) ParsedData {
+	d := ParsedData{
+		RangeBlocks: make([]RangeBlock, 7),
 	}
 
-	currVals := rangeBlock{}
+	currVals := RangeBlock{}
 	currBlock := -1
 
 	for _, l := range *s {
@@ -49,23 +37,23 @@ func parseInput(s *[]string) parsedData {
 			parts := strings.Split(l, " ")
 			for _, seed := range parts {
 				if seed != "" {
-					d.seeds = append(d.seeds, utils.ConvertToNumber(seed))
+					d.Seeds = append(d.Seeds, utils.ConvertToNumber(seed))
 				}
 			}
 		} else if l == "" {
 			// store and reset current range block
 			if currBlock >= 0 {
-				d.rangeBlocks[currBlock] = currVals
+				d.RangeBlocks[currBlock] = currVals
 			}
 
-			currVals = rangeBlock{}
+			currVals = RangeBlock{}
 		} else if utils.IsNumber(l[0]) {
 			// append range to existing block
 			parts := strings.Split(l, " ")
-			currVals = append(currVals, valRange{
-				destStart:   utils.ConvertToNumber(parts[0]),
-				sourceStart: utils.ConvertToNumber(parts[1]),
-				width:       utils.ConvertToNumber(parts[2]),
+			currVals = append(currVals, ValRange{
+				DestStart:   utils.ConvertToNumber(parts[0]),
+				SourceStart: utils.ConvertToNumber(parts[1]),
+				Width:       utils.ConvertToNumber(parts[2]),
 			})
 		} else {
 			currBlock++
@@ -73,7 +61,7 @@ func parseInput(s *[]string) parsedData {
 	}
 
 	if len(currVals) > 0 {
-		d.rangeBlocks[currBlock] = currVals
+		d.RangeBlocks[currBlock] = currVals
 	}
 
 	return d
