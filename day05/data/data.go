@@ -5,6 +5,22 @@ type ParsedData struct {
 	RangeBlocks []RangeBlock
 }
 
+func (p *ParsedData) GetSeedRanges() [][]int {
+	ranges := [][]int{}
+	seedStart := -1
+	for _, s := range p.Seeds {
+		if seedStart < 0 {
+			seedStart = s
+			continue
+		} else {
+			ranges = append(ranges, []int{seedStart, seedStart + s})
+			seedStart = -1
+		}
+	}
+
+	return ranges
+}
+
 type ValRange struct {
 	DestStart   int
 	SourceStart int

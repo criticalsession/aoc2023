@@ -10,28 +10,42 @@ import (
 
 func main() {
 	s, err := utils.GetInput(utils.InputOptions{
-		Path: "input.txt",
+		Path: "sample.txt",
 	})
 	utils.Catch(err)
 
-	solve(s, false)
+	//solve(s, false)
+	solve(s, true)
 }
 
 func solve(s []string, partTwo bool) {
 	d := parseInput(&s)
 	minLoc := -1
-	for _, seed := range d.Seeds {
-		fin := seed
-		for _, rb := range d.RangeBlocks {
-			fin = rb.GetDestValue(fin)
-		}
 
-		if minLoc < 0 || fin < minLoc {
-			minLoc = fin
+	if !partTwo {
+		for i := range d.Seeds {
+			updateMinloc(&d.Seeds[i], &d, &minLoc)
+		}
+	} else {
+		for _, sr := range d.GetSeedRanges() {
+			for i := sr[0]; i < sr[1]; i++ {
+				updateMinloc(&i, &d, &minLoc)
+			}
 		}
 	}
 
 	fmt.Println(minLoc)
+}
+
+func updateMinloc(seed *int, d *ParsedData, minLoc *int) {
+	fin := *seed
+	for _, rb := range d.RangeBlocks {
+		fin = rb.GetDestValue(fin)
+	}
+
+	if *minLoc < 0 || fin < *minLoc {
+		*minLoc = fin
+	}
 }
 
 func parseInput(s *[]string) ParsedData {
