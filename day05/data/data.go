@@ -5,6 +5,14 @@ type ParsedData struct {
 	RangeBlocks []RangeBlock
 }
 
+func (p *ParsedData) Walk(seed int) int {
+	for i := range p.RangeBlocks {
+		seed = p.RangeBlocks[i].GetDestValue(seed)
+	}
+
+	return seed
+}
+
 func (p *ParsedData) GetSeedRanges() [][]int {
 	ranges := [][]int{}
 	seedStart := -1
@@ -23,12 +31,13 @@ func (p *ParsedData) GetSeedRanges() [][]int {
 
 type ValRange struct {
 	DestStart   int
+	DestEnd     int
 	SourceStart int
-	Width       int
+	SourceEnd   int
 }
 
 func (v *ValRange) GetDestValue(s int) int {
-	if s < v.SourceStart || s > v.SourceStart+v.Width {
+	if s < v.SourceStart || s > v.SourceEnd {
 		// outside of range
 		return -1
 	}
@@ -39,12 +48,12 @@ func (v *ValRange) GetDestValue(s int) int {
 type RangeBlock []ValRange
 
 func (r *RangeBlock) GetDestValue(s int) int {
-	for _, v := range *r {
-		if val := v.GetDestValue(s); val >= 0 {
+	for i := range *r {
+		if val := (*r)[i].GetDestValue(s); val >= 0 {
 			return val
 		}
 	}
 
-	//sny source numbers that aren't mapped correspond to the same destination number.
+	// any source numbers that aren't mapped correspond to the same destination number.
 	return s
 }

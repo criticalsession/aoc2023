@@ -14,8 +14,7 @@ func main() {
 	})
 	utils.Catch(err)
 
-	//solve(s, false)
-	solve(s, true)
+	solve(s, false)
 }
 
 func solve(s []string, partTwo bool) {
@@ -38,11 +37,7 @@ func solve(s []string, partTwo bool) {
 }
 
 func updateMinloc(seed *int, d *ParsedData, minLoc *int) {
-	fin := *seed
-	for _, rb := range d.RangeBlocks {
-		fin = rb.GetDestValue(fin)
-	}
-
+	fin := d.Walk(*seed)
 	if *minLoc < 0 || fin < *minLoc {
 		*minLoc = fin
 	}
@@ -76,10 +71,15 @@ func parseInput(s *[]string) ParsedData {
 		} else if utils.IsNumber(l[0]) {
 			// append range to existing block
 			parts := strings.Split(l, " ")
+			ds, ss, w := utils.ConvertToNumber(parts[0]),
+				utils.ConvertToNumber(parts[1]),
+				utils.ConvertToNumber(parts[2])
+
 			currVals = append(currVals, ValRange{
-				DestStart:   utils.ConvertToNumber(parts[0]),
-				SourceStart: utils.ConvertToNumber(parts[1]),
-				Width:       utils.ConvertToNumber(parts[2]),
+				DestStart:   ds,
+				DestEnd:     ds + w,
+				SourceStart: ss,
+				SourceEnd:   ss + w,
 			})
 		} else {
 			currBlock++
