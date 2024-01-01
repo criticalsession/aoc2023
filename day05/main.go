@@ -10,7 +10,7 @@ import (
 
 func main() {
 	s, err := utils.GetInput(utils.InputOptions{
-		Path: "sample.txt",
+		Path: "input.txt",
 	})
 	utils.Catch(err)
 
@@ -19,7 +19,19 @@ func main() {
 
 func solve(s []string, partTwo bool) {
 	d := parseInput(&s)
-	fmt.Println(d)
+	minLoc := -1
+	for _, seed := range d.Seeds {
+		fin := seed
+		for _, rb := range d.RangeBlocks {
+			fin = rb.GetDestValue(fin)
+		}
+
+		if minLoc < 0 || fin < minLoc {
+			minLoc = fin
+		}
+	}
+
+	fmt.Println(minLoc)
 }
 
 func parseInput(s *[]string) ParsedData {
