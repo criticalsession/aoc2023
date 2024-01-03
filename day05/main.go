@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	. "github.com/criticalsession/aoc2023/day05/data"
 	"github.com/criticalsession/aoc2023/utils"
@@ -26,16 +27,24 @@ func solve(s []string, partTwo bool) {
 			updateMinloc(&d.Seeds[i], &d, &minLoc)
 		}
 	} else {
+		t1 := time.Now()
 		seedRanges := d.GetSeedRanges()
-		for _, rb := range d.RangeBlocks {
-			seedRanges = rb.FindOverlappingRanges(seedRanges)
+
+		chans := make([]chan []StartEnd, len(seedRanges))
+		for i, sr := range seedRanges {
+			chans[i] = make(chan []StartEnd)
+			go processSeedRange(sr, d.RangeBlocks, chans[i])
 		}
 
-		for _, r := range seedRanges {
-			if minLoc < 0 || r.Start < minLoc {
-				minLoc = r.Start
+		for _, c := range chans {
+			for _, r := range <-c {
+				if minLoc < 0 || r.Start < minLoc {
+					minLoc = r.Start
+				}
 			}
 		}
+
+		fmt.Println(time.Since(t1))
 	}
 
 	fmt.Println(minLoc)
@@ -46,6 +55,15 @@ func updateMinloc(seed *int, d *ParsedData, minLoc *int) {
 	if *minLoc < 0 || fin < *minLoc {
 		*minLoc = fin
 	}
+}
+
+func processSeedRange(sr StartEnd, rb []RangeBlock, c chan []StartEnd) {
+	updatedSeedRange := []StartEnd{sr}
+	for _, rb := range rb {
+		updatedSeedRange = rb.FindOverlappingRanges(updatedSeedRange)
+	}
+
+	c <- updatedSeedRange
 }
 
 func parseInput(s *[]string) ParsedData {
