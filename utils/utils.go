@@ -37,7 +37,9 @@ func GetInput(o InputOptions) ([]string, error) {
 func SplitAndTrim(s string, sep string) []string {
 	var parts []string
 	for _, p := range strings.Split(s, sep) {
-		parts = append(parts, strings.TrimSpace(p))
+		if strings.TrimSpace(p) != "" {
+			parts = append(parts, strings.TrimSpace(p))
+		}
 	}
 	return parts
 }
