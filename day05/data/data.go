@@ -1,5 +1,7 @@
 package data
 
+import "fmt"
+
 type ParsedData struct {
 	Seeds       []int
 	RangeBlocks []RangeBlock
@@ -21,10 +23,12 @@ func (p *ParsedData) GetSeedRanges() [][]int {
 			seedStart = s
 			continue
 		} else {
-			ranges = append(ranges, []int{seedStart, seedStart + s})
+			ranges = append(ranges, []int{seedStart, seedStart + s - 1})
 			seedStart = -1
 		}
 	}
+
+	fmt.Println(ranges)
 
 	return ranges
 }

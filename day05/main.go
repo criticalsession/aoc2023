@@ -14,7 +14,7 @@ func main() {
 	})
 	utils.Catch(err)
 
-	solve(s, false)
+	solve(s, true)
 }
 
 func solve(s []string, partTwo bool) {
@@ -77,9 +77,9 @@ func parseInput(s *[]string) ParsedData {
 
 			currVals = append(currVals, ValRange{
 				DestStart:   ds,
-				DestEnd:     ds + w,
+				DestEnd:     ds + w - 1,
 				SourceStart: ss,
-				SourceEnd:   ss + w,
+				SourceEnd:   ss + w - 1,
 			})
 		} else {
 			currBlock++
