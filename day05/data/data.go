@@ -1,18 +1,8 @@
 package data
 
-import "fmt"
-
 type ParsedData struct {
 	Seeds       []int
 	RangeBlocks []RangeBlock
-}
-
-func (p *ParsedData) Walk(seed int) int {
-	for i := range p.RangeBlocks {
-		seed = p.RangeBlocks[i].GetDestValue(seed)
-	}
-
-	return seed
 }
 
 func (p *ParsedData) Walk(seed int) int {
@@ -36,21 +26,19 @@ func (p *ParsedData) GetSeedRanges() []StartEnd {
 			seedStart = s
 			continue
 		} else {
-			ranges = append(ranges, StartEnd{seedStart, seedStart + s})
+			ranges = append(ranges, StartEnd{seedStart, seedStart + s - 1})
 			seedStart = -1
 		}
 	}
-
-	fmt.Println(ranges)
 
 	return ranges
 }
 
 type ValRange struct {
 	DestStart   int
-	DestEnd     int
 	SourceStart int
 	SourceEnd   int
+	Offset      int
 }
 
 func (v *ValRange) GetDestValue(s int) int {
@@ -75,27 +63,40 @@ func (r *RangeBlock) GetDestValue(s int) int {
 	return s
 }
 
-func (r *RangeBlock) ConvertToOverlappingRanges(s int, e int) {
-	fmt.Println(s, e)
-
+func (r *RangeBlock) FindOverlappingRanges(rngs []StartEnd) []StartEnd {
 	results := []StartEnd{}
-	for i := range *r {
-		sourceStart := (*r)[i].SourceStart
-		sourceEnd := (*r)[i].SourceStart + (*r)[i].Width
-		fmt.Println("checking:", sourceStart, sourceEnd)
+	newRanges := []StartEnd{}
 
-		if e >= sourceStart && s < sourceEnd {
-			fmt.Println("overlap")
+	for _, rng := range rngs {
+		found := false
+		for _, v := range *r {
+			if rng.End >= v.SourceStart && rng.Start < v.SourceEnd {
+				// overlaps
+				overlapStart := max(rng.Start, v.SourceStart)
+				overlapEnd := min(rng.End, v.SourceEnd)
+				results = append(results, StartEnd{overlapStart + v.Offset, overlapEnd + v.Offset})
 
-			// overlaps
-			overlapStart := max(s, sourceStart)
-			overlapEnd := min(e, sourceEnd)
-			results = append(results, StartEnd{
-				overlapStart - sourceStart + (*r)[i].DestStart,
-				overlapEnd - sourceStart + (*r)[i].DestStart,
-			})
+				if overlapStart > rng.Start {
+					newRanges = append(newRanges, StartEnd{rng.Start, overlapStart - 1})
+				}
+
+				if overlapEnd < rng.End {
+					newRanges = append(newRanges, StartEnd{overlapEnd, rng.End})
+				}
+
+				found = true
+				break
+			}
+		}
+
+		if !found { // fallthrough
+			results = append(results, rng)
 		}
 	}
 
-	fmt.Println(results)
+	if len(newRanges) > 0 { // there are unprocessed ranges
+		results = append(results, (*r).FindOverlappingRanges(newRanges)...)
+	}
+
+	return results
 }

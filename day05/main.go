@@ -10,7 +10,7 @@ import (
 
 func main() {
 	s, err := utils.GetInput(utils.InputOptions{
-		Path: "sample.txt",
+		Path: "input.txt",
 	})
 	utils.Catch(err)
 
@@ -26,7 +26,16 @@ func solve(s []string, partTwo bool) {
 			updateMinloc(&d.Seeds[i], &d, &minLoc)
 		}
 	} else {
-		d.RangeBlocks[0].ConvertToOverlappingRanges(d.GetSeedRanges()[0].Start, d.GetSeedRanges()[0].End)
+		seedRanges := d.GetSeedRanges()
+		for _, rb := range d.RangeBlocks {
+			seedRanges = rb.FindOverlappingRanges(seedRanges)
+		}
+
+		for _, r := range seedRanges {
+			if minLoc < 0 || r.Start < minLoc {
+				minLoc = r.Start
+			}
+		}
 	}
 
 	fmt.Println(minLoc)
@@ -73,9 +82,9 @@ func parseInput(s *[]string) ParsedData {
 
 			currVals = append(currVals, ValRange{
 				DestStart:   ds,
-				DestEnd:     ds + w - 1,
 				SourceStart: ss,
 				SourceEnd:   ss + w - 1,
+				Offset:      ds - ss,
 			})
 		} else {
 			currBlock++
