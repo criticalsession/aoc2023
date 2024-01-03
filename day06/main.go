@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/criticalsession/aoc2023/utils"
 )
@@ -13,10 +14,10 @@ func main() {
 	})
 	utils.Catch(err)
 
-	solve(s, false)
+	solve2(s)
 }
 
-func solve(s []string, partTwo bool) {
+func solve(s []string) {
 	time := utils.SplitAndTrim(s[0], " ")
 	distance := utils.SplitAndTrim(s[1], " ")
 
@@ -40,4 +41,36 @@ func solve(s []string, partTwo bool) {
 	}
 
 	fmt.Println(result)
+}
+
+func solve2(s []string) {
+	time := utils.ConvertToNumber(strings.ReplaceAll(s[0], " ", ""))
+	distance := utils.ConvertToNumber(strings.ReplaceAll(s[1], " ", ""))
+
+	min := -1
+	max := -1
+	i := 1
+
+	for {
+		if min > 0 && max > 0 {
+			break
+		}
+
+		if min < 0 {
+			if i*(time-i) > distance {
+				min = i
+			}
+		}
+
+		if max < 0 {
+			j := time - i
+			if j*(time-j) > distance {
+				max = j
+			}
+		}
+
+		i++
+	}
+
+	fmt.Println(max - min + 1)
 }
