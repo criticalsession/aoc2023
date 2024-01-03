@@ -26,11 +26,7 @@ func solve(s []string, partTwo bool) {
 			updateMinloc(&d.Seeds[i], &d, &minLoc)
 		}
 	} else {
-		for _, sr := range d.GetSeedRanges() {
-			for i := sr[0]; i < sr[1]; i++ {
-				updateMinloc(&i, &d, &minLoc)
-			}
-		}
+		d.RangeBlocks[0].ConvertToOverlappingRanges(d.GetSeedRanges()[0].Start, d.GetSeedRanges()[0].End)
 	}
 
 	fmt.Println(minLoc)
